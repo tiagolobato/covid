@@ -1,6 +1,10 @@
 package com.example.lib;
 
 
+import org.w3c.dom.css.RGBColor;
+
+import java.awt.Color;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,35 +16,65 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 public class RectEdgesDetector {
+    private static double yScale = 1;
+    private static double xScale = 1;
+    private static int left = (int) (310 * yScale);
+    private static int top = 300;
+    private static int right = (int) (390 * yScale);
+    private static int bottom = 900;
+
+    private static int topC = (int) (520 * xScale);
+    private static int bottomC = (int) (540 * xScale);
+
+    private static int topT = (int) (580 * xScale);
+
+    private static int bottomT = (int) (600 * xScale);
+
+    static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+        return outputImage;
+    }
     public static String detectRectEdges(int tolerance) throws IOException {
-        File imageFile = new File("C:\\Users\\tiago\\AndroidStudioProjects\\MyApplication\\lib\\src\\main\\java\\com\\example\\lib\\positivo.png");
-        BufferedImage image = ImageIO.read(imageFile);
+        File imageFile = new File("C:\\Users\\tiago\\AndroidStudioProjects\\MyApplication\\lib\\src\\main\\java\\com\\example\\lib\\pic4.jpg");
+
+        BufferedImage image = resizeImage(ImageIO.read(imageFile),1504,720);
+        File outputfile = new File("image.jpg");
+        ImageIO.write(image, "jpg", outputfile);
         int width = image.getWidth();
         int height = image.getHeight();
+        /*
         int xTopo1 = 107;
         int yEsquerdo = 200;
         int yDireito = 280;
         int xBaixo1 = 120;
         int xTopo2 = 169;
         int xBaixo2 = 184;
+        */
+        int xTopo1 = 733;
+        int yEsquerdo = 424;
+        int yDireito = 497;
+        int xBaixo1 = 766;
+        int xTopo2 = 890;
+        int xBaixo2 = 915;
+        Point ponto1Linha1 = new Point(topC,left);
+        Point ponto2Linha1 = new Point(topC,right);
 
-        Point ponto1Linha1 = new Point(xTopo1,yEsquerdo);
-        Point ponto2Linha1 = new Point(xTopo1,yDireito);
+        Point ponto1Linha2 = new Point(bottomC,left);
+        Point ponto2Linha2 = new Point(bottomC,right);
 
-        Point ponto1Linha2 = new Point(xBaixo1,yEsquerdo);
-        Point ponto2Linha2 = new Point(xBaixo1,yDireito);
+        Point ponto1Linha3 = new Point(topT,left);
+        Point ponto2Linha3 = new Point(topT,right);
 
-        Point ponto1Linha3 = new Point(xTopo2,yEsquerdo);
-        Point ponto2Linha3 = new Point(xTopo2,yDireito);
-
-        Point ponto1Linha4 = new Point(xBaixo2,yEsquerdo);
-        Point ponto2Linha4 = new Point(xBaixo2,yDireito);
+        Point ponto1Linha4 = new Point(bottomT,left);
+        Point ponto2Linha4 = new Point(bottomT,right);
 
         Intervalo intervaloC = new Intervalo(new Linha(ponto1Linha1,ponto2Linha1), new Linha(ponto1Linha2,ponto2Linha2));
         Intervalo intervaloT = new Intervalo(new Linha(ponto1Linha3,ponto2Linha3), new Linha(ponto1Linha4,ponto2Linha4));
 
 
-        int backgroundColor = calculateBackgroundColor(image);
+        int backgroundColor = new Color(144, 27, 36).getRGB();
 
         List<Point> pontosC = PercorrerIntervalo(tolerance, image, intervaloC, backgroundColor);
         List<Point> pontosT = PercorrerIntervalo(tolerance, image, intervaloT, backgroundColor);
@@ -64,9 +98,9 @@ public class RectEdgesDetector {
         List<Point> rectanglePoints = new ArrayList<>();
         for (int x = intervaloT.PontoInicial.x; x < intervaloT.PontoFinal.x; x++) {
             for (int y = intervaloT.PontoInicial.y; y < intervaloT.PontoFinal.y; y++) {
-                int pixel = image.getRGB(y, x);
+                int pixel = image.getRGB(x, y);
 
-                if (isPontoVermelho(pixel, backgroundColor, 50)) {
+                if (isPontoVermelho(pixel, backgroundColor, 10)) {
                     rectanglePoints.add(new Point(x, y));
                     int redDiff = Math.abs(((pixel >> 16) & 0xFF));
                     int greenDiff = Math.abs(((pixel >> 8) & 0xFF) );
@@ -162,7 +196,7 @@ public class RectEdgesDetector {
         int greenDiff = Math.abs(((pixel >> 8) & 0xFF) - ((backgroundColor >> 8) & 0xFF));
         int blueDiff = Math.abs((pixel & 0xFF) - (backgroundColor & 0xFF));
         int mediaDiff = (redDiff + greenDiff + blueDiff)/3;
-        return mediaDiff > tolerance;
+        return mediaDiff < tolerance;
     }
 
     private static boolean isIntervaloVermelho(int quantidadePontos) {
