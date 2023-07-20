@@ -22,6 +22,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -922,7 +923,7 @@ public class Camera2BasicFragment extends Fragment
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
-    private static class ImageSaver implements Runnable {
+    private class ImageSaver implements Runnable {
 
         /**
          * The JPEG image
@@ -938,7 +939,34 @@ public class Camera2BasicFragment extends Fragment
             mFile = file;
         }
 
+        private byte[] BitmapToByte(Bitmap bitmap){
 
+            int size = bitmap.getRowBytes() * bitmap.getHeight();
+            ByteBuffer byteBuffer = ByteBuffer.allocate(size);
+            bitmap.copyPixelsToBuffer(byteBuffer);
+            return byteBuffer.array();
+        }
+
+        private void tryToSaveImage(Bitmap image,String nome) {
+            try {
+                int quality = 100;
+                Context context = getActivity();
+                File rootPath = new File(context.getExternalFilesDir(null),"covid");
+                if(!rootPath.exists()) {
+                    boolean sucesso =  rootPath.mkdir();
+                    if (sucesso) {
+                        Log.d("MainActivity", "Diretório criado com sucesso!");
+                    } else {
+                        Log.d("MainActivity", "Falha ao criar diretório!");
+                    }
+                }
+                FileOutputStream fos = new FileOutputStream(new File(rootPath, nome));
+                image.compress(Bitmap.CompressFormat.JPEG, quality, fos);
+                fos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         @Override
         public void run() {
@@ -962,35 +990,24 @@ public class Camera2BasicFragment extends Fragment
             int topT = (int) (Constantes.TOPT * multiplicadorErro);
             int bottomT = (int) (Constantes.TOPT_BOTTOMT * multiplicadorErro) ;
             Bitmap scaleBitmap = Bitmap.createScaledBitmap(capturedImage, 1504, 720, false);
-            Bitmap croppedImage = Bitmap.createBitmap(capturedImage, 0, 0, capturedImage.getWidth(), capturedImage.getHeight(), matrix, false);
-            Bitmap croppedImage2 = Bitmap.createBitmap(croppedImage, (int) (Constantes.LEFT * multiplicadorW), (int) (top * multiplicadorH), (int) (Constantes.LEFT_RIGHT * multiplicadorW), (int) (bottom * multiplicadorH));
 
             Bitmap croppedImageSclaed = Bitmap.createBitmap(scaleBitmap, 0, 0, scaleBitmap.getWidth(), scaleBitmap.getHeight(), matrix, false);
             Bitmap croppedImageFinal = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, top, Constantes.LEFT_RIGHT,bottom);
             Bitmap croppedC = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, topC, Constantes.LEFT_RIGHT,bottomC);
             Bitmap croppedT = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, topT, Constantes.LEFT_RIGHT,bottomT);
+            Bitmap croppedEntreCeT = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, bottomC + 10, Constantes.LEFT_RIGHT,topT - 10);
+
+            tryToSaveImage(croppedImageFinal,"saidaTotal.jpg");
+            tryToSaveImage(croppedC,"saidaC.jpg");
+            tryToSaveImage(croppedT,"saidaT.jpg");
+            String resultado = ProcessarImagem.GetResultado(croppedC,croppedT,croppedEntreCeT);
+            Intent intent = new Intent();
+            intent.setClass(getActivity(), ResultActivity.class);
+            intent.putExtra("resultado", resultado);
+            getActivity().startActivity(intent);
 
 
-            FileOutputStream output = null;
-            try {
-                output = new FileOutputStream(mFile);
-                output.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                mImage.close();
-                if (null != output) {
-                    try {
-                        output.close();
-                        BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                        Bitmap bitmap = BitmapFactory.decodeFile(mFile.getPath());
-                        int teste = 1;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+
         }
 
     }
