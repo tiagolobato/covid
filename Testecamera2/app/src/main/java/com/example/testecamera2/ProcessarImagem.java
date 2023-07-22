@@ -25,25 +25,23 @@ public class ProcessarImagem {
         List<Point> pontosT = PercorrerImagem(imageT,backgroundColor);
         List<Point> pontosEntreCeT = PercorrerImagem(imageEntreCeT,backgroundColor);
 
-        String resultado = "";
         if(isIntervaloVermelho(pontosEntreCeT.size())){
-            resultado = "Inválido";
+            return "Inválido";
         }
         if(isIntervaloVermelho(pontosT.size()) && isIntervaloVermelho(pontosC.size())){
-            resultado = "Positivo";
+            return "Positivo";
         }
         if(!isIntervaloVermelho(pontosT.size()) && isIntervaloVermelho(pontosC.size())){
-            resultado = "Negativo";
+            return "Negativo";
         }
         if(isIntervaloVermelho(pontosT.size()) && !isIntervaloVermelho(pontosC.size())){
-            resultado = "Inválido";
+            return "Inválido";
         }
         if(!isIntervaloVermelho(pontosT.size()) && !isIntervaloVermelho(pontosC.size())){
-            resultado = "Inválido";
+            return "Inválido";
         }
+        return "Inválido";
 
-
-        return resultado;
     }
 
 

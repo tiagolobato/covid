@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "144007028347",
+    "project_id": "covid-aplicativo",
+    "storage_bucket": "covid-aplicativo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144007028347:android:8d0d7b62d241fd6c250cde",
+        "android_client_info": {
+          "package_name": "com.example.testecamera2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "144007028347-gr4rm8oos11sh1hokn7lt43n3443ddrj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDucR5VC0tsPgopdY5ssb4b_g6eRjNP7ec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "144007028347-gr4rm8oos11sh1hokn7lt43n3443ddrj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

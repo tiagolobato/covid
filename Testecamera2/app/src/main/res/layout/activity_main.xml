@@ -36,34 +36,52 @@
             android:text="Covid-19 Biokit"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/imageView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
 
+        <TextView
+            android:id="@+id/usuario_id"
+            android:layout_width="407dp"
+            android:layout_height="76dp"
+            android:background="#432C81"
+            android:gravity="center"
+            android:text="Seu identificador de usuário é: \n 123456"
+            android:textColor="#FFFFFF"
+            android:textIsSelectable="true"
+            android:textSize="20sp"
+
+            app:layout_constraintBottom_toTopOf="@+id/imageView"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintVertical_bias="0.5"
+            tools:layout_editor_absoluteX="3dp" />
+
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="416dp"
-            android:layout_height="485dp"
+            android:layout_width="299dp"
+            android:layout_height="405dp"
+            android:layout_marginStart="16dp"
             android:src="@drawable/mundo"
             app:layout_constraintBottom_toTopOf="@+id/capture_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.531"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintVertical_bias="0.674" />
 
         <Button
             android:id="@+id/capture_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="11dp"
+            android:drawableLeft="@android:drawable/ic_menu_search"
             android:text="Analisar"
+            app:backgroundTint="#432C81"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView"
-            app:backgroundTint="#432C81"
-            android:drawableLeft="@android:drawable/ic_menu_search"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

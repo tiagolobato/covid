@@ -46,7 +46,7 @@ public class CsvCreator {
         }
     }
 
-    private static String getCurrentDate() {
+    public static String getCurrentDate() {
         // Obtém a data do momento em formato "dd/MM/yyyy HH:mm:ss"
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();

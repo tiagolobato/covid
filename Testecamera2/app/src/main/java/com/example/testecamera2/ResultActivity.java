@@ -1,11 +1,10 @@
 package com.example.testecamera2;
 
 
-import android.Manifest;
-import android.content.Context;
+import static android.content.ContentValues.TAG;
+
+import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,23 +12,28 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ResultActivity extends AppCompatActivity {
 
     private TextView resultLabel;
     private ConstraintLayout resultPage;
     private TextView resultadoDescricao;
-    private Button captureButton;
+    private Button backButton;
+    private Button enviarResultadosButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,10 +45,21 @@ public class ResultActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String resultado = intent.getStringExtra("resultado");
-        captureButton = findViewById(R.id.back_button);
-        captureButton.setOnClickListener(new View.OnClickListener() {
+        backButton = findViewById(R.id.back_button);
+        enviarResultadosButton = findViewById(R.id.enviar_resultado);
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(ResultActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        enviarResultadosButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enviarResultado(resultado);
+                showToast("Resultado enviado com sucesso!");
                 Intent intent = new Intent(ResultActivity.this, MainActivity.class);
                 startActivity(intent);
             }
@@ -70,11 +85,53 @@ public class ResultActivity extends AppCompatActivity {
         }
         resultLabel.setText("  Teste\n" + resultado.toUpperCase());
 
-        String id = IdConfig.id(getApplicationContext());
+
         File rootPath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"result.csv");
+        String id = IdConfig.id(getApplicationContext());
         CsvCreator.createCsvFileIfNotExists(rootPath.getPath(),resultado,id);
 
 
+
+
+    }
+
+    private void showToast(final String text) {
+        final Activity activity = this;
+        if (activity != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(activity, text, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    private void enviarResultado(String resultado) {
+        String id = IdConfig.id(getApplicationContext());
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Create a new user with a first and last name
+        Map<String, Object> user = new HashMap<>();
+        user.put("resultado", resultado);
+        user.put("_id", id);
+        user.put("data", CsvCreator.getCurrentDate());
+
+// Add a new document with a generated ID
+        db.collection("registros")
+                .add(user)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
     }
 
 }

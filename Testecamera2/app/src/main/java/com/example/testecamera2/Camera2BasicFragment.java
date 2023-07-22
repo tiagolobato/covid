@@ -86,6 +86,7 @@ public class Camera2BasicFragment extends Fragment
      * Conversion from screen rotation to JPEG orientation.
      */
     private LinearLayout linearLayout;
+    Button voltarButton;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
@@ -433,13 +434,24 @@ public class Camera2BasicFragment extends Fragment
 
         linearLayout = view.findViewById(R.id.surface);
         linearLayout.addView(new Rectangle(getActivity()));
+
+        voltarButton = view.findViewById(R.id.voltar);
+        voltarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(getActivity(), MainActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
+
+
         return view;
     }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         view.findViewById(R.id.picture).setOnClickListener(this);
-        view.findViewById(R.id.info).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
     }
 
@@ -847,7 +859,6 @@ public class Camera2BasicFragment extends Fragment
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }
@@ -951,7 +962,7 @@ public class Camera2BasicFragment extends Fragment
             try {
                 int quality = 100;
                 Context context = getActivity();
-                File rootPath = new File(context.getExternalFilesDir(null),"covid");
+                File rootPath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"");
                 if(!rootPath.exists()) {
                     boolean sucesso =  rootPath.mkdir();
                     if (sucesso) {
@@ -995,11 +1006,12 @@ public class Camera2BasicFragment extends Fragment
             Bitmap croppedImageFinal = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, top, Constantes.LEFT_RIGHT,bottom);
             Bitmap croppedC = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, topC, Constantes.LEFT_RIGHT,bottomC);
             Bitmap croppedT = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, topT, Constantes.LEFT_RIGHT,bottomT);
-            Bitmap croppedEntreCeT = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, bottomC + 10, Constantes.LEFT_RIGHT,topT - 10);
+            Bitmap croppedEntreCeT = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, topC + bottomC + 5 , Constantes.LEFT_RIGHT,topT - bottomC -topC - 5);
 
             tryToSaveImage(croppedImageFinal,"saidaTotal.jpg");
             tryToSaveImage(croppedC,"saidaC.jpg");
             tryToSaveImage(croppedT,"saidaT.jpg");
+            tryToSaveImage(croppedEntreCeT,"saidaEntreCeT.jpg");
             String resultado = ProcessarImagem.GetResultado(croppedC,croppedT,croppedEntreCeT);
             Intent intent = new Intent();
             intent.setClass(getActivity(), ResultActivity.class);
