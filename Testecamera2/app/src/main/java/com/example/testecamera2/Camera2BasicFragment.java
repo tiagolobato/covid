@@ -926,8 +926,8 @@ public class Camera2BasicFragment extends Fragment
 
     private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
         if (mFlashSupported) {
-            requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+
+            requestBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
         }
     }
 
@@ -993,7 +993,7 @@ public class Camera2BasicFragment extends Fragment
 
             double multiplicadorH = (double) capturedImage.getWidth()/1504;
             double multiplicadorW = (double)capturedImage.getHeight()/720;
-            double multiplicadorErro = 1.17;
+            double multiplicadorErro = 1.18;
             int top = (int) (Constantes.TOP * multiplicadorErro);
             int bottom = (int) (Constantes.TOP_BOTTOM * multiplicadorErro) ;
             int topC = (int) (Constantes.TOPC * multiplicadorErro);

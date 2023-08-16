@@ -10,12 +10,12 @@ import android.view.View;
 public class Constantes  {
     Paint paint = new Paint();
 
-    public static final int LEFT = 310;
-    public static final int TOP = 300;
-    public static final int RIGHT = 390;
+    public static final int LEFT = 330;
+    public static final int TOP = 480;
+    public static final int RIGHT = 370;
 
     public static final int LEFT_RIGHT = RIGHT-LEFT;
-    public static final int BOTTOM = 900;
+    public static final int BOTTOM = 740;
 
     public static final int TOP_BOTTOM = BOTTOM-TOP;
 

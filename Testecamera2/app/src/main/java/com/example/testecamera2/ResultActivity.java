@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ public class ResultActivity extends AppCompatActivity {
     private TextView resultadoDescricao;
     private Button backButton;
     private Button enviarResultadosButton;
+    private ImageView sinalImg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +44,7 @@ public class ResultActivity extends AppCompatActivity {
         resultLabel = findViewById(R.id.result_label);
         resultadoDescricao = findViewById(R.id.resultado_descricao);
         resultPage = findViewById(R.id.result_page);
+        sinalImg = findViewById(R.id.sinal_img);
 
         Intent intent = getIntent();
         String resultado = intent.getStringExtra("resultado");
@@ -66,24 +69,24 @@ public class ResultActivity extends AppCompatActivity {
         });
 
         if(resultado.equals("Positivo")){
-            resultPage.setBackgroundColor(Color.parseColor("#ff0000"));
+            resultadoDescricao.setBackgroundColor(Color.parseColor("#ff0000"));
             resultadoDescricao.setText("Procure um médico");
-            resultadoDescricao.setTextColor(Color.parseColor("#ffffff"));
-            resultLabel.setTextColor(Color.parseColor("#ffffff"));
+            resultLabel.setBackgroundColor(Color.parseColor("#ff0000"));
+            sinalImg.setImageResource(R.drawable.sinal_vermelho);
         }
         if(resultado.equals("Negativo")){
-            resultPage.setBackgroundColor(Color.parseColor("#4fa866"));
+            resultadoDescricao.setBackgroundColor(Color.parseColor("#4fa866"));
             resultadoDescricao.setText("Esse resultado não garante 100% de certeza");
-            resultadoDescricao.setTextColor(Color.parseColor("#ffffff"));
-            resultLabel.setTextColor(Color.parseColor("#ffffff"));
+            resultLabel.setBackgroundColor(Color.parseColor("#4fa866"));
+            sinalImg.setImageResource(R.drawable.sinal_verde);
         }
         if(resultado.equals("Inválido")){
-            resultPage.setBackgroundColor(Color.parseColor("#ffd966"));
+            resultadoDescricao.setBackgroundColor(Color.parseColor("#ffd966"));
             resultadoDescricao.setText("Exame deve ser descartado e repetido com outro kit");
-            resultadoDescricao.setTextColor(Color.parseColor("#ff0000"));
-            resultLabel.setTextColor(Color.parseColor("#ff0000"));
+            resultLabel.setBackgroundColor(Color.parseColor("#ffd966"));
+            sinalImg.setImageResource(R.drawable.sinal_amarelo);
         }
-        resultLabel.setText("  Teste\n" + resultado.toUpperCase());
+        resultLabel.setText("Teste\n" + resultado.toUpperCase());
 
 
         File rootPath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"result.csv");

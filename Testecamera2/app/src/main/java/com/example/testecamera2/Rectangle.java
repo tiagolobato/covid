@@ -13,9 +13,9 @@ public class Rectangle extends View {
     public Rectangle(Context context) {
         super(context);
     }
-    private int left = 310;
+    private int left = 320;
     private int top = 300;
-    private int right = 390;
+    private int right = 380;
     private int bottom = 900;
 
     private int topC = 520;
