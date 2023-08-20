@@ -69,7 +69,6 @@ import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -433,7 +432,7 @@ public class Camera2BasicFragment extends Fragment
         View view = inflater.inflate(R.layout.activity_camera2_basic_fragment, container, false);
 
         linearLayout = view.findViewById(R.id.surface);
-        linearLayout.addView(new Rectangle(getActivity()));
+        linearLayout.addView(new Retangulo(getActivity()));
 
         voltarButton = view.findViewById(R.id.voltar);
         voltarButton.setOnClickListener(new View.OnClickListener() {
@@ -1012,7 +1011,7 @@ public class Camera2BasicFragment extends Fragment
             tryToSaveImage(croppedC,"saidaC.jpg");
             tryToSaveImage(croppedT,"saidaT.jpg");
             tryToSaveImage(croppedEntreCeT,"saidaEntreCeT.jpg");
-            String resultado = ProcessarImagem.GetResultado(croppedC,croppedT,croppedEntreCeT);
+            String resultado = ProcessarImagem.BuscarResultado(croppedC,croppedT,croppedEntreCeT);
             Intent intent = new Intent();
             intent.setClass(getActivity(), ResultActivity.class);
             intent.putExtra("resultado", resultado);

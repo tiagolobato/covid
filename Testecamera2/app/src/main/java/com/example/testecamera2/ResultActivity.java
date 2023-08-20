@@ -30,27 +30,27 @@ import java.util.Map;
 
 public class ResultActivity extends AppCompatActivity {
 
-    private TextView resultLabel;
-    private ConstraintLayout resultPage;
+    private TextView resultadoLabel;
+    private ConstraintLayout resultadoPage;
     private TextView resultadoDescricao;
-    private Button backButton;
-    private Button enviarResultadosButton;
-    private ImageView sinalImg;
+    private Button botaoVoltar;
+    private Button botaoEnviarResultado;
+    private ImageView imagemSemaforo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
 
-        resultLabel = findViewById(R.id.result_label);
+        resultadoLabel = findViewById(R.id.resultado_label);
         resultadoDescricao = findViewById(R.id.resultado_descricao);
-        resultPage = findViewById(R.id.result_page);
-        sinalImg = findViewById(R.id.sinal_img);
+        resultadoPage = findViewById(R.id.result_page);
+        imagemSemaforo = findViewById(R.id.semaforo_image);
 
         Intent intent = getIntent();
         String resultado = intent.getStringExtra("resultado");
-        backButton = findViewById(R.id.back_button);
-        enviarResultadosButton = findViewById(R.id.enviar_resultado);
-        backButton.setOnClickListener(new View.OnClickListener() {
+        botaoVoltar = findViewById(R.id.voltar_button);
+        botaoEnviarResultado = findViewById(R.id.enviar_resultado_button);
+        botaoVoltar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ResultActivity.this, MainActivity.class);
@@ -58,11 +58,11 @@ public class ResultActivity extends AppCompatActivity {
             }
         });
 
-        enviarResultadosButton.setOnClickListener(new View.OnClickListener() {
+        botaoEnviarResultado.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 enviarResultado(resultado);
-                showToast("Resultado enviado com sucesso!");
+                mostrarToast("Resultado enviado com sucesso!");
                 Intent intent = new Intent(ResultActivity.this, MainActivity.class);
                 startActivity(intent);
             }
@@ -71,68 +71,64 @@ public class ResultActivity extends AppCompatActivity {
         if(resultado.equals("Positivo")){
             resultadoDescricao.setBackgroundColor(Color.parseColor("#ff0000"));
             resultadoDescricao.setText("Procure um médico");
-            resultLabel.setBackgroundColor(Color.parseColor("#ff0000"));
-            sinalImg.setImageResource(R.drawable.sinal_vermelho);
+            resultadoLabel.setBackgroundColor(Color.parseColor("#ff0000"));
+            imagemSemaforo.setImageResource(R.drawable.sinal_vermelho);
         }
         if(resultado.equals("Negativo")){
             resultadoDescricao.setBackgroundColor(Color.parseColor("#4fa866"));
             resultadoDescricao.setText("Esse resultado não garante 100% de certeza");
-            resultLabel.setBackgroundColor(Color.parseColor("#4fa866"));
-            sinalImg.setImageResource(R.drawable.sinal_verde);
+            resultadoLabel.setBackgroundColor(Color.parseColor("#4fa866"));
+            imagemSemaforo.setImageResource(R.drawable.sinal_verde);
         }
         if(resultado.equals("Inválido")){
             resultadoDescricao.setBackgroundColor(Color.parseColor("#ffd966"));
             resultadoDescricao.setText("Exame deve ser descartado e repetido com outro kit");
-            resultLabel.setBackgroundColor(Color.parseColor("#ffd966"));
-            sinalImg.setImageResource(R.drawable.sinal_amarelo);
+            resultadoLabel.setBackgroundColor(Color.parseColor("#ffd966"));
+            imagemSemaforo.setImageResource(R.drawable.sinal_amarelo);
         }
-        resultLabel.setText("Teste\n" + resultado.toUpperCase());
+        resultadoLabel.setText("Teste\n" + resultado.toUpperCase());
 
 
-        File rootPath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"result.csv");
-        String id = IdConfig.id(getApplicationContext());
-        CsvCreator.createCsvFileIfNotExists(rootPath.getPath(),resultado,id);
-
-
+        File caminhoRaiz = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"result.csv");
+        String id = ConfiguracaoId.id(getApplicationContext());
+        GeradorCsv.criarArquivoCsvSeNaoExistir(caminhoRaiz.getPath(),resultado,id);
 
 
     }
 
-    private void showToast(final String text) {
+    private void mostrarToast(final String texto) {
         final Activity activity = this;
         if (activity != null) {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(activity, text, Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, texto, Toast.LENGTH_LONG).show();
                 }
             });
         }
     }
 
     private void enviarResultado(String resultado) {
-        String id = IdConfig.id(getApplicationContext());
+        String id = ConfiguracaoId.id(getApplicationContext());
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Create a new user with a first and last name
-        Map<String, Object> user = new HashMap<>();
-        user.put("resultado", resultado);
-        user.put("_id", id);
-        user.put("data", CsvCreator.getCurrentDate());
+        Map<String, Object> registro = new HashMap<>();
+        registro.put("resultado", resultado);
+        registro.put("_id", id);
+        registro.put("data", GeradorCsv.buscarDataHoraAtual());
 
-// Add a new document with a generated ID
         db.collection("registros")
-                .add(user)
+                .add(registro)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                        Log.d(TAG, "Documento adicionado com ID: " + documentReference.getId());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
+                        Log.w(TAG, "Erro ao adicionar documento", e);
                     }
                 });
     }

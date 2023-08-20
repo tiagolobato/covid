@@ -8,7 +8,7 @@
 
 
     <TextView
-        android:id="@+id/result_label"
+        android:id="@+id/resultado_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -37,12 +37,12 @@
         android:textColor="#ffffff"
         android:textAlignment="center"
         android:padding="4dp"
-        app:layout_constraintEnd_toEndOf="@+id/result_label"
-        app:layout_constraintStart_toStartOf="@+id/result_label"
-        app:layout_constraintTop_toBottomOf="@+id/result_label"/>
+        app:layout_constraintEnd_toEndOf="@+id/resultado_label"
+        app:layout_constraintStart_toStartOf="@+id/resultado_label"
+        app:layout_constraintTop_toBottomOf="@+id/resultado_label"/>
 
     <Button
-        android:id="@+id/back_button"
+        android:id="@+id/voltar_button"
         android:layout_width="227dp"
         android:layout_height="53dp"
         android:layout_marginBottom="20dp"
@@ -55,20 +55,20 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/enviar_resultado"
+        android:id="@+id/enviar_resultado_button"
         android:layout_width="203dp"
         android:layout_height="73dp"
         android:text="Enviar resultado"
         android:layout_marginBottom="10dp"
         android:textColor="#fff"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/back_button"
-        app:layout_constraintEnd_toEndOf="@+id/back_button"
+        app:layout_constraintBottom_toTopOf="@+id/voltar_button"
+        app:layout_constraintEnd_toEndOf="@+id/voltar_button"
         app:layout_constraintHorizontal_bias="0.53"
-        app:layout_constraintStart_toStartOf="@+id/back_button" />
+        app:layout_constraintStart_toStartOf="@+id/voltar_button" />
 
     <ImageView
-        android:id="@+id/sinal_img"
+        android:id="@+id/semaforo_image"
         android:layout_width="137dp"
         android:layout_height="164dp"
         android:layout_marginTop="20dp"

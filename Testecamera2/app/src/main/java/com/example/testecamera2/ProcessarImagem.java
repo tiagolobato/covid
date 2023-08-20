@@ -3,15 +3,9 @@ package com.example.testecamera2;
 
 
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.util.Log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,43 +13,35 @@ import java.util.List;
 
 public class ProcessarImagem {
 
-    private static int strong_red6 = Color.rgb(113, 80, 97);
-    private static int strong_red5 = Color.rgb(118, 90, 104);
-    private static int strong_red4 = Color.rgb(112, 88, 101);
-    private static int strong_red3 = Color.rgb(124, 91, 108);
-    private static int strong_red2 = Color.rgb(127, 106, 115);
-    private static int strong_red = Color.rgb(109, 60, 82);
-    private static int medium_red = Color.rgb(138, 86, 109);
-    private static int light_red = Color.rgb(167, 157, 168);
+    private static int vermelhoEscuro = Color.rgb(109, 60, 82);
+    private static int vermelhoMedio = Color.rgb(138, 86, 109);
+    private static int vermelhoClaro = Color.rgb(167, 157, 168);
 
-    private static int light_red2 = Color.rgb(198, 185, 179);
-    private static int[] acceptedColours = {
-            strong_red,
-            medium_red,
-            light_red,
-            light_red2
+    private static int[] coresAceitas = {
+            vermelhoEscuro,
+            vermelhoMedio,
+            vermelhoClaro
     };
-    public static String GetResultado(Bitmap imageC, Bitmap imageT,Bitmap imageEntreCeT) {
-        int backgroundColor = Color.rgb(167, 60, 78);
+    public static String BuscarResultado(Bitmap imagemControle, Bitmap imagemTeste, Bitmap imageEntreCeT) {
 
         int corMedia = CorMedia(imageEntreCeT);
-        List<Point> pontosC = PercorrerImagemInvetido(imageC, corMedia,9);
-        List<Point> pontosT = PercorrerImagemInvetido(imageT,corMedia,9);
+        List<Point> pontosC = PercorrerImagemInvetido(imagemControle, corMedia,9);
+        List<Point> pontosT = PercorrerImagemInvetido(imagemTeste,corMedia,9);
         List<Point> pontosEntreCeT = PercorrerImagemInvetido(imageEntreCeT,corMedia,12);
 
         if(pontosEntreCeT.size() > 200){
             return "Inválido";
         }
-        if(isIntervaloVermelho(pontosT.size()) && isIntervaloVermelho(pontosC.size())){
+        if(isIntervaloReagente(pontosT.size()) && isIntervaloReagente(pontosC.size())){
             return "Positivo";
         }
-        if(!isIntervaloVermelho(pontosT.size()) && isIntervaloVermelho(pontosC.size())){
+        if(!isIntervaloReagente(pontosT.size()) && isIntervaloReagente(pontosC.size())){
             return "Negativo";
         }
-        if(isIntervaloVermelho(pontosT.size()) && !isIntervaloVermelho(pontosC.size())){
+        if(isIntervaloReagente(pontosT.size()) && !isIntervaloReagente(pontosC.size())){
             return "Inválido";
         }
-        if(!isIntervaloVermelho(pontosT.size()) && !isIntervaloVermelho(pontosC.size())){
+        if(!isIntervaloReagente(pontosT.size()) && !isIntervaloReagente(pontosC.size())){
             return "Inválido";
         }
         return "Inválido";
@@ -64,61 +50,53 @@ public class ProcessarImagem {
 
 
 
-    private static List<Point>  PercorrerImagem(Bitmap image, int backgroundColor) {
+    private static List<Point>  PercorrerImagem(Bitmap imagem, int backgroundColor) {
         List<Point> rectanglePoints = new ArrayList<>();
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                int pixel = image.getPixel(x, y);
+        for (int x = 0; x < imagem.getWidth(); x++) {
+            for (int y = 0; y < imagem.getHeight(); y++) {
+                int pixel = imagem.getPixel(x, y);
 
-                boolean hasRed =  Arrays.stream(acceptedColours).anyMatch(i -> isPontoVermelho(pixel, i, 3));
-                if (hasRed) {
+                boolean isPontoReagente =  Arrays.stream(coresAceitas).anyMatch(i -> isPontoReagente(pixel, i, 3));
+                if (isPontoReagente) {
                     rectanglePoints.add(new Point(x, y));
-                    int redDiff = Math.abs(((pixel >> 16) & 0xFF));
-                    int greenDiff = Math.abs(((pixel >> 8) & 0xFF) );
-                    int blueDiff = Math.abs((pixel & 0xFF) );
-                    int teste =1;
                 }
             }
         }
         return rectanglePoints;
     }
 
-    private static List<Point>  PercorrerImagemInvetido(Bitmap image, int corMedia, int tolerancia) {
-        List<Point> rectanglePoints = new ArrayList<>();
+    private static List<Point>  PercorrerImagemInvetido(Bitmap imagem, int corMedia, int tolerancia) {
+        List<Point> pontosReagentes = new ArrayList<>();
 
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                int pixel = image.getPixel(x, y);
+        for (int x = 0; x < imagem.getWidth(); x++) {
+            for (int y = 0; y < imagem.getHeight(); y++) {
+                int pixel = imagem.getPixel(x, y);
 
-                boolean hasRed =  isPontoVermelhoInvertido(pixel,corMedia,tolerancia);
-                if (hasRed) {
-                    rectanglePoints.add(new Point(x, y));
-                    int redDiff = Math.abs(((pixel >> 16) & 0xFF));
-                    int greenDiff = Math.abs(((pixel >> 8) & 0xFF) );
-                    int blueDiff = Math.abs((pixel & 0xFF) );
-                    int teste =1;
+                boolean isPontoReagente =  isPontoReagenteInvertido(pixel,corMedia,tolerancia);
+                if (isPontoReagente) {
+                    pontosReagentes.add(new Point(x, y));
                 }
             }
         }
-        return rectanglePoints;
+        return pontosReagentes;
     }
 
 
 
-    private static boolean isPontoVermelho(int pixel, int backgroundColor, int tolerance) {
+    private static boolean isPontoReagente(int pixel, int backgroundColor, int tolerancia) {
         int redDiff = Math.abs(((pixel >> 16) & 0xFF) - ((backgroundColor >> 16) & 0xFF));
         int greenDiff = Math.abs(((pixel >> 8) & 0xFF) - ((backgroundColor >> 8) & 0xFF));
         int blueDiff = Math.abs((pixel & 0xFF) - (backgroundColor & 0xFF));
         int mediaDiff = (redDiff + greenDiff + blueDiff)/3;
-        return mediaDiff < tolerance;
+        return mediaDiff < tolerancia;
     }
 
-    private static boolean isPontoVermelhoInvertido(int pixel, int backgroundColor, int tolerance) {
+    private static boolean isPontoReagenteInvertido(int pixel, int backgroundColor, int tolerancia) {
         int redDiff = Math.abs(((pixel >> 16) & 0xFF) - ((backgroundColor >> 16) & 0xFF));
         int greenDiff = Math.abs(((pixel >> 8) & 0xFF) - ((backgroundColor >> 8) & 0xFF));
         int blueDiff = Math.abs((pixel & 0xFF) - (backgroundColor & 0xFF));
         int mediaDiff = (redDiff + greenDiff + blueDiff)/3;
-        return mediaDiff > tolerance;
+        return mediaDiff > tolerancia;
     }
 
     private static int CorMedia(Bitmap image) {
@@ -136,7 +114,7 @@ public class ProcessarImagem {
         return Color.rgb((int) sumr / num, (int)sumg / num, (int)sumb / num);
     }
 
-    private static boolean isIntervaloVermelho(int quantidadePontos) {
+    private static boolean isIntervaloReagente(int quantidadePontos) {
 
         return quantidadePontos > 50;
     }
