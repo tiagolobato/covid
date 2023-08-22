@@ -368,7 +368,7 @@ public class Camera2BasicFragment extends Fragment
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, text, Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -949,13 +949,6 @@ public class Camera2BasicFragment extends Fragment
             mFile = file;
         }
 
-        private byte[] BitmapToByte(Bitmap bitmap){
-
-            int size = bitmap.getRowBytes() * bitmap.getHeight();
-            ByteBuffer byteBuffer = ByteBuffer.allocate(size);
-            bitmap.copyPixelsToBuffer(byteBuffer);
-            return byteBuffer.array();
-        }
 
         private void tryToSaveImage(Bitmap image,String nome) {
             try {
@@ -978,6 +971,8 @@ public class Camera2BasicFragment extends Fragment
             }
         }
 
+
+
         @Override
         public void run() {
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
@@ -990,8 +985,6 @@ public class Camera2BasicFragment extends Fragment
 
             Bitmap capturedImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-            double multiplicadorH = (double) capturedImage.getWidth()/1504;
-            double multiplicadorW = (double)capturedImage.getHeight()/720;
             double multiplicadorErro = 1.18;
             int top = (int) (Constantes.TOP * multiplicadorErro);
             int bottom = (int) (Constantes.TOP_BOTTOM * multiplicadorErro) ;
@@ -1011,6 +1004,7 @@ public class Camera2BasicFragment extends Fragment
             tryToSaveImage(croppedC,"saidaC.jpg");
             tryToSaveImage(croppedT,"saidaT.jpg");
             tryToSaveImage(croppedEntreCeT,"saidaEntreCeT.jpg");
+
             String resultado = ProcessarImagem.BuscarResultado(croppedC,croppedT,croppedEntreCeT);
             Intent intent = new Intent();
             intent.setClass(getActivity(), ResultActivity.class);

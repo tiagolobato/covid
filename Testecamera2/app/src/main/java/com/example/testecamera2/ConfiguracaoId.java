@@ -6,20 +6,21 @@ import android.content.SharedPreferences;
 import java.util.UUID;
 
 public class ConfiguracaoId {
+    private static final String ALIAS_ID_UNICO = "ALIAS_ID_UNICO";
     private static String IdUnico = null;
-    private static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
+
 
     public synchronized static String id(Context context) {
         if (IdUnico == null) {
 
             SharedPreferences sharedPrefs = context.getSharedPreferences(
-                    PREF_UNIQUE_ID, Context.MODE_PRIVATE);
-            IdUnico = sharedPrefs.getString(PREF_UNIQUE_ID, null);
+                    ALIAS_ID_UNICO, Context.MODE_PRIVATE);
+            IdUnico = sharedPrefs.getString(ALIAS_ID_UNICO, null);
 
             if (IdUnico == null) {
                 IdUnico = UUID.randomUUID().toString();
                 SharedPreferences.Editor editor = sharedPrefs.edit();
-                editor.putString(PREF_UNIQUE_ID, IdUnico);
+                editor.putString(ALIAS_ID_UNICO, IdUnico);
                 editor.commit();
             }
         }

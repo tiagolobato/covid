@@ -68,19 +68,19 @@ public class ResultActivity extends AppCompatActivity {
             }
         });
 
-        if(resultado.equals("Positivo")){
+        if(resultado.equals(Resultado.POSITIVO)){
             resultadoDescricao.setBackgroundColor(Color.parseColor("#ff0000"));
             resultadoDescricao.setText("Procure um médico");
             resultadoLabel.setBackgroundColor(Color.parseColor("#ff0000"));
             imagemSemaforo.setImageResource(R.drawable.sinal_vermelho);
         }
-        if(resultado.equals("Negativo")){
+        if(resultado.equals(Resultado.NEGATIVO)){
             resultadoDescricao.setBackgroundColor(Color.parseColor("#4fa866"));
             resultadoDescricao.setText("Esse resultado não garante 100% de certeza");
             resultadoLabel.setBackgroundColor(Color.parseColor("#4fa866"));
             imagemSemaforo.setImageResource(R.drawable.sinal_verde);
         }
-        if(resultado.equals("Inválido")){
+        if(resultado.equals(Resultado.INVALIDO)){
             resultadoDescricao.setBackgroundColor(Color.parseColor("#ffd966"));
             resultadoDescricao.setText("Exame deve ser descartado e repetido com outro kit");
             resultadoLabel.setBackgroundColor(Color.parseColor("#ffd966"));

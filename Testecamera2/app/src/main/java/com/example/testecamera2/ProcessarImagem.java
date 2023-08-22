@@ -30,21 +30,21 @@ public class ProcessarImagem {
         List<Point> pontosEntreCeT = PercorrerImagemInvetido(imageEntreCeT,corMedia,12);
 
         if(pontosEntreCeT.size() > 200){
-            return "Inválido";
+            return Resultado.INVALIDO;
         }
         if(isIntervaloReagente(pontosT.size()) && isIntervaloReagente(pontosC.size())){
-            return "Positivo";
+            return Resultado.POSITIVO;
         }
         if(!isIntervaloReagente(pontosT.size()) && isIntervaloReagente(pontosC.size())){
-            return "Negativo";
+            return Resultado.NEGATIVO;
         }
         if(isIntervaloReagente(pontosT.size()) && !isIntervaloReagente(pontosC.size())){
-            return "Inválido";
+            return Resultado.INVALIDO;
         }
         if(!isIntervaloReagente(pontosT.size()) && !isIntervaloReagente(pontosC.size())){
-            return "Inválido";
+            return Resultado.INVALIDO;
         }
-        return "Inválido";
+        return Resultado.INVALIDO;
 
     }
 
