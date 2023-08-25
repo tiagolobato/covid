@@ -1,9 +1,7 @@
 package com.example.covidne;
 
-import android.graphics.Paint;
 
 public class Constantes  {
-    Paint paint = new Paint();
 
     public static final int LEFT = 330;
     public static final int TOP = 480;
