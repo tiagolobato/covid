@@ -80,7 +80,7 @@
             android:layout_width="350dp"
             android:layout_height="348dp"
             android:layout_marginStart="16dp"
-            android:src="@drawable/icon2_round"
+            android:src="@drawable/icon3_round"
             app:layout_constraintBottom_toTopOf="@+id/analisar_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.311"

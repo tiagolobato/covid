@@ -987,19 +987,24 @@ public class Camera2BasicFragment extends Fragment
             Bitmap capturedImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
             double multiplicadorErro = 1.18;
-            int top = (int) (Constantes.TOP * multiplicadorErro);
-            int bottom = (int) (Constantes.TOP_BOTTOM * multiplicadorErro) ;
-            int topC = (int) (Constantes.TOPC * multiplicadorErro);
-            int bottomC = (int) (Constantes.TOPC_BOTTOMC * multiplicadorErro) ;
-            int topT = (int) (Constantes.TOPT * multiplicadorErro);
-            int bottomT = (int) (Constantes.TOPT_BOTTOMT * multiplicadorErro) ;
+
+            int width = Posicoes.getScreenWidth();
+            int height = Posicoes.getScreenHeight();
+
+            Posicoes posicoes = new Posicoes(width,height);
+            int top = (int) (posicoes.TOP * multiplicadorErro);
+            int bottom = (int) (posicoes.TOP_BOTTOM * multiplicadorErro) ;
+            int topC = (int) (posicoes.TOPC * multiplicadorErro);
+            int bottomC = (int) (posicoes.TOPC_BOTTOMC * multiplicadorErro) ;
+            int topT = (int) (posicoes.TOPT * multiplicadorErro);
+            int bottomT = (int) (posicoes.TOPT_BOTTOMT * multiplicadorErro) ;
             Bitmap scaleBitmap = Bitmap.createScaledBitmap(capturedImage, 1504, 720, false);
 
             Bitmap croppedImageSclaed = Bitmap.createBitmap(scaleBitmap, 0, 0, scaleBitmap.getWidth(), scaleBitmap.getHeight(), matrix, false);
-            Bitmap croppedImageFinal = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, top, Constantes.LEFT_RIGHT,bottom);
-            Bitmap croppedC = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, topC, Constantes.LEFT_RIGHT,bottomC);
-            Bitmap croppedT = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, topT, Constantes.LEFT_RIGHT,bottomT);
-            Bitmap croppedEntreCeT = Bitmap.createBitmap(croppedImageSclaed, Constantes.LEFT, topC + bottomC + 5 , Constantes.LEFT_RIGHT,topT - bottomC -topC - 5);
+            Bitmap croppedImageFinal = Bitmap.createBitmap(croppedImageSclaed, posicoes.LEFT, top, posicoes.LEFT_RIGHT,bottom);
+            Bitmap croppedC = Bitmap.createBitmap(croppedImageSclaed, posicoes.LEFT, topC, posicoes.LEFT_RIGHT,bottomC);
+            Bitmap croppedT = Bitmap.createBitmap(croppedImageSclaed, posicoes.LEFT, topT, posicoes.LEFT_RIGHT,bottomT);
+            Bitmap croppedEntreCeT = Bitmap.createBitmap(croppedImageSclaed, posicoes.LEFT, topC + bottomC + 5 , posicoes.LEFT_RIGHT,topT - bottomC -topC - 5);
 
             tryToSaveImage(croppedImageFinal,"saidaTotal.jpg");
             tryToSaveImage(croppedC,"saidaC.jpg");
