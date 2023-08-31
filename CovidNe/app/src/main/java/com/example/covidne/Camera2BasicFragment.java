@@ -20,6 +20,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,10 +46,13 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -70,12 +75,15 @@ import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -947,11 +955,11 @@ public class Camera2BasicFragment extends Fragment
 
         ImageSaver(Image image, File file) {
             mImage = image;
-            mFile = file;
+            mFile = file; 
         }
 
 
-        private void tryToSaveImage(Bitmap image,String nome) {
+        private void tryToSaveImage2(Bitmap image,String nome) {
             try {
                 int quality = 100;
                 Context context = getActivity();
@@ -970,6 +978,25 @@ public class Camera2BasicFragment extends Fragment
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        private void tryToSaveImage(Bitmap bitmap, @NonNull String name) throws IOException {
+            OutputStream fos;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentResolver resolver = getActivity().getContentResolver();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name + ".jpg");
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+            } else {
+                String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+                File image = new File(imagesDir, name + ".jpg");
+                fos = new FileOutputStream(image);
+            }
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            Objects.requireNonNull(fos).close();
         }
 
 
@@ -1006,10 +1033,15 @@ public class Camera2BasicFragment extends Fragment
             Bitmap croppedT = Bitmap.createBitmap(croppedImageSclaed, posicoes.LEFT, topT, posicoes.LEFT_RIGHT,bottomT);
             Bitmap croppedEntreCeT = Bitmap.createBitmap(croppedImageSclaed, posicoes.LEFT, topC + bottomC + 5 , posicoes.LEFT_RIGHT,topT - bottomC -topC - 5);
 
-            tryToSaveImage(croppedImageFinal,"saidaTotal.jpg");
-            tryToSaveImage(croppedC,"saidaC.jpg");
-            tryToSaveImage(croppedT,"saidaT.jpg");
-            tryToSaveImage(croppedEntreCeT,"saidaEntreCeT.jpg");
+            try {
+                tryToSaveImage(croppedImageFinal,"saidaTotal.jpg");
+                tryToSaveImage(croppedC,"saidaC.jpg");
+                tryToSaveImage(croppedT,"saidaT.jpg");
+                tryToSaveImage(croppedEntreCeT,"saidaEntreCeT.jpg");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
 
             String resultado = ProcessarImagem.BuscarResultado(croppedC,croppedT,croppedEntreCeT);
             Intent intent = new Intent();
