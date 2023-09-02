@@ -32,6 +32,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -90,11 +91,15 @@ import java.util.concurrent.TimeUnit;
 public class Camera2BasicFragment extends Fragment
         implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
+    private Rect rectZoom;
+
+    private boolean zoom = false;
     /**
      * Conversion from screen rotation to JPEG orientation.
      */
     private LinearLayout linearLayout;
     Button voltarButton;
+    Button zoomButton;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
@@ -265,6 +270,18 @@ public class Camera2BasicFragment extends Fragment
         }
 
     };
+
+    private Rect getZoomedRect(float zoomLevel, CameraCharacteristics cameraCharacteristics) {
+        if(rectZoom != null) return rectZoom;
+
+        Rect activeRect = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+        int minW = (int) (activeRect.width() / zoomLevel);
+        int minH = (int) (activeRect.height() / zoomLevel);
+        int difW = activeRect.width() - minW;
+        int difH = activeRect.height() - minH;
+        rectZoom = new Rect(activeRect.left + difW / 2, activeRect.top + difH / 2, activeRect.right - difW / 2, activeRect.bottom - difH / 2);
+        return rectZoom;
+    }
 
     /**
      * {@link CaptureRequest.Builder} for the camera preview
@@ -450,6 +467,22 @@ public class Camera2BasicFragment extends Fragment
                 Intent intent = new Intent();
                 intent.setClass(getActivity(), MainActivity.class);
                 getActivity().startActivity(intent);
+            }
+        });
+
+        zoomButton = view.findViewById(R.id.zoom);
+        zoomButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(zoom){
+                    zoom = false;
+                    zoomButton.setText("Ligar Zoom 2x");
+                }
+                else{
+                    zoom = true;
+                    zoomButton.setText("Desligar Zoom");
+                }
+                createCameraPreviewSession();
             }
         });
 
@@ -641,6 +674,8 @@ public class Camera2BasicFragment extends Fragment
         configureTransform(width, height);
         Activity activity = getActivity();
         CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+
+
         try {
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
@@ -739,9 +774,10 @@ public class Camera2BasicFragment extends Fragment
                                         CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                                 // Flash is automatically enabled when necessary.
                                 setAutoFlash(mPreviewRequestBuilder);
+                                DarZoom(mPreviewRequestBuilder);
+                                mPreviewRequest = mPreviewRequestBuilder.build();
 
                                 // Finally, we start displaying the camera preview.
-                                mPreviewRequest = mPreviewRequestBuilder.build();
                                 mCaptureSession.setRepeatingRequest(mPreviewRequest,
                                         mCaptureCallback, mBackgroundHandler);
                             } catch (CameraAccessException e) {
@@ -758,6 +794,28 @@ public class Camera2BasicFragment extends Fragment
             );
         } catch (CameraAccessException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void DarZoom(CaptureRequest.Builder requestBuilder) {
+        if(!zoom) return;
+        Activity activity = getActivity();
+        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+
+        String cameraId ;
+        try {
+            cameraId = manager.getCameraIdList()[0];
+        } catch (CameraAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            float zoomLevel = 2.0f; // Zoom de 2x
+
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, getZoomedRect(zoomLevel,characteristics));
+
+        } catch (CameraAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -874,6 +932,8 @@ public class Camera2BasicFragment extends Fragment
 
             mCaptureSession.stopRepeating();
             mCaptureSession.abortCaptures();
+            DarZoom(captureBuilder);
+            captureBuilder.build();
             mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
@@ -1013,10 +1073,10 @@ public class Camera2BasicFragment extends Fragment
 
             Bitmap capturedImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-            double multiplicadorErro = 1.18;
 
             int width = Posicoes.getScreenWidth();
             int height = Posicoes.getScreenHeight();
+            double multiplicadorErro = ((double) capturedImage.getHeight()/capturedImage.getWidth()) / ((double) width/height);
 
             Posicoes posicoes = new Posicoes(width,height);
             int top = (int) (posicoes.TOP * multiplicadorErro);
@@ -1025,7 +1085,7 @@ public class Camera2BasicFragment extends Fragment
             int bottomC = (int) (posicoes.TOPC_BOTTOMC * multiplicadorErro) ;
             int topT = (int) (posicoes.TOPT * multiplicadorErro);
             int bottomT = (int) (posicoes.TOPT_BOTTOMT * multiplicadorErro) ;
-            Bitmap scaleBitmap = Bitmap.createScaledBitmap(capturedImage, 1504, 720, false);
+            Bitmap scaleBitmap = Bitmap.createScaledBitmap(capturedImage, height, width, false);
 
             Bitmap croppedImageSclaed = Bitmap.createBitmap(scaleBitmap, 0, 0, scaleBitmap.getWidth(), scaleBitmap.getHeight(), matrix, false);
             Bitmap croppedImageFinal = Bitmap.createBitmap(croppedImageSclaed, posicoes.LEFT, top, posicoes.LEFT_RIGHT,bottom);
