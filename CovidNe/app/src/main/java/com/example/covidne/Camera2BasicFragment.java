@@ -63,6 +63,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -98,6 +99,7 @@ public class Camera2BasicFragment extends Fragment
      * Conversion from screen rotation to JPEG orientation.
      */
     private LinearLayout linearLayout;
+    private FrameLayout controlLayout;
     Button voltarButton;
     Button zoomButton;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -457,7 +459,10 @@ public class Camera2BasicFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_camera2_basic_fragment, container, false);
 
+        controlLayout = view.findViewById(R.id.control);
+
         linearLayout = view.findViewById(R.id.surface);
+
         linearLayout.addView(new Retangulo(getActivity()));
 
         voltarButton = view.findViewById(R.id.voltar);
@@ -494,6 +499,8 @@ public class Camera2BasicFragment extends Fragment
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         view.findViewById(R.id.picture).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+
+
     }
 
     @Override
@@ -511,7 +518,9 @@ public class Camera2BasicFragment extends Fragment
         // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
         // a camera and start preview from here (otherwise, we wait until the surface is ready in
         // the SurfaceTextureListener).
+
         if (mTextureView.isAvailable()) {
+
             openCamera(mTextureView.getWidth(), mTextureView.getHeight());
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
@@ -634,6 +643,11 @@ public class Camera2BasicFragment extends Fragment
                         rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
                         maxPreviewHeight, largest);
 
+                int screenHeight = Posicoes.getScreenHeight();
+                ViewGroup.LayoutParams layoutParams = controlLayout.getLayoutParams();
+                layoutParams.height = screenHeight - mPreviewSize.getWidth();
+                controlLayout.setLayoutParams(layoutParams);
+
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
                 int orientation = getResources().getConfiguration().orientation;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -670,6 +684,7 @@ public class Camera2BasicFragment extends Fragment
             requestCameraPermission();
             return;
         }
+
         setUpCameraOutputs(width, height);
         configureTransform(width, height);
         Activity activity = getActivity();
@@ -754,6 +769,8 @@ public class Camera2BasicFragment extends Fragment
             mPreviewRequestBuilder
                     = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mPreviewRequestBuilder.addTarget(surface);
+
+
 
             // Here, we create a CameraCaptureSession for camera preview.
             mCameraDevice.createCaptureSession(Arrays.asList(surface, mImageReader.getSurface()),
@@ -1093,6 +1110,7 @@ public class Camera2BasicFragment extends Fragment
             Bitmap croppedT = Bitmap.createBitmap(croppedImageSclaed, posicoes.LEFT, topT, posicoes.LEFT_RIGHT,bottomT);
             Bitmap croppedEntreCeT = Bitmap.createBitmap(croppedImageSclaed, posicoes.LEFT, topC + bottomC + 5 , posicoes.LEFT_RIGHT,topT - bottomC -topC - 5);
 
+            /*
             try {
                 tryToSaveImage(croppedImageFinal,"saidaTotal.jpg");
                 tryToSaveImage(croppedC,"saidaC.jpg");
@@ -1101,6 +1119,8 @@ public class Camera2BasicFragment extends Fragment
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
+             */
 
 
             String resultado = ProcessarImagem.BuscarResultado(croppedC,croppedT,croppedEntreCeT);
